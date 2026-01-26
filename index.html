@@ -5,9 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔒 Agenda Crew Max 2026</title>
     <style>
-        :root { --bg: #f0f2f5; --free: #2ecc71; --almost: #f1c40f; --majority: #f39c12; --accent: #3498db; }
+        :root { 
+            --bg: #f0f2f5; 
+            --free: #2ecc71; 
+            --almost: #ffff00; /* Jaune FLASHY */
+            --majority: #f39c12; 
+            --accent: #3498db; 
+            --absent: #e74c3c;
+        }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; min-height: 100vh; }
         
+        /* Verrouillage */
         #lock-screen { text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 2000; position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #lock-screen input { padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; margin-bottom: 15px; }
         #lock-screen button { padding: 10px 25px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
@@ -16,25 +24,32 @@
         .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
         .header { text-align: center; margin-bottom: 30px; position: sticky; top: 0; background: white; z-index: 10; padding: 15px; border-bottom: 1px solid #eee; }
-        .view-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-        .tab-btn { padding: 8px 15px; border: none; border-radius: 20px; cursor: pointer; background: #eee; font-weight: bold; transition: 0.3s; }
-        .tab-btn.active { background: var(--accent); color: white; }
+        
+        /* Onglets */
+        .view-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; margin-bottom: 15px; }
+        .tab-btn { padding: 10px 20px; border: none; border-radius: 25px; cursor: pointer; background: #eee; font-weight: bold; transition: 0.3s; font-size: 14px; }
+        .tab-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
 
         .month-title { margin-top: 40px; color: #2c3e50; border-left: 5px solid var(--accent); padding-left: 15px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 30px; }
         .weekday-header { font-size: 11px; font-weight: bold; color: #95a5a6; text-align: center; }
         
-        .day { aspect-ratio: 1/1; border: 1px solid #f0f0f0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; background: #fff; transition: 0.2s; }
-        .day-num { font-size: 16px; font-weight: bold; }
-        .day-name { font-size: 9px; text-transform: uppercase; color: #7f8c8d; }
-        .cross { color: #e74c3c; font-size: 22px; position: absolute; top: 2px; right: 5px; }
-        .count { font-size: 10px; color: #666; margin-top: 5px; }
+        .day { aspect-ratio: 1/1; border: 1px solid #f0f0f0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; background: #fff; transition: 0.1s; }
+        .day:active { transform: scale(0.95); }
+        .day-num { font-size: 16px; font-weight: bold; z-index: 2; }
+        .day-name { font-size: 9px; text-transform: uppercase; color: #7f8c8d; z-index: 2; }
+        .cross { color: var(--absent); font-size: 26px; position: absolute; font-weight: bold; z-index: 3; text-shadow: 0 0 5px white; }
+        .count { font-size: 10px; color: #333; margin-top: 5px; font-weight: bold; z-index: 2; }
         
-        /* Couleurs */
+        /* Couleurs Agenda Crew */
         .status-all-free { background-color: var(--free) !important; color: white; border: none; }
-        .status-almost { background-color: var(--almost) !important; color: white; border: none; }
+        .status-almost { background-color: var(--almost) !important; color: #000 !important; border: 2px solid #ffd700; }
         .status-majority { background-color: var(--majority) !important; color: white; border: none; }
-        .status-me-out { border: 2px solid #e74c3c; }
+        
+        /* Style Mon Agenda */
+        .mode-me .day { border: 2px solid #eee; }
+        .mode-me .day.is-absent { border: 3px solid var(--absent); background-color: #fff5f5; }
+        .mode-me .day.is-absent .day-num { color: var(--absent); }
 
         #custom-menu { position: absolute; background: white; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); padding: 12px; display: none; z-index: 3000; min-width: 150px; border: 1px solid #ddd; }
         .user-list { font-size: 12px; margin: 0; padding: 0; list-style: none; }
@@ -45,10 +60,10 @@
         .btn-del { color: red; cursor: pointer; margin-left: 8px; font-weight: bold; }
         
         .legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; font-size: 12px; margin-top: 10px; color: #666; }
-        .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+        .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid #ccc; }
     </style>
 </head>
-<body>
+<body id="body-tag">
 
 <div id="custom-menu"></div>
 
@@ -65,27 +80,30 @@
             <h1>📅 Agenda Crew Max 2026</h1>
             <div id="logged-area" style="font-size:14px; font-weight:bold; color:var(--accent); margin-bottom:10px;">
                 Membre : <span id="display-name"></span> 
-                <button id="btn-logout" style="font-size: 10px; cursor: pointer;">Changer</button>
+                <button id="btn-logout" style="font-size: 10px; cursor: pointer; margin-left:10px;">Changer</button>
             </div>
             <input type="text" id="username" placeholder="Ton prénom..." style="padding:10px; border-radius:8px; border:1px solid #ddd; display:none;">
             
             <div class="view-tabs">
-                <button id="tab-crew" class="tab-btn active">Agenda Crew</button>
-                <button id="tab-me" class="tab-btn">Mon Agenda</button>
+                <button id="tab-crew" class="tab-btn active">Agenda du Groupe</button>
+                <button id="tab-me" class="tab-btn">📝 Marquer mes absences</button>
             </div>
 
-            <div class="legend">
-                <span><div class="dot" style="background: var(--free)"></div> 100% OK</span>
-                <span><div class="dot" style="background: var(--almost)"></div> -1 pers.</span>
+            <div id="legend-crew" class="legend">
+                <span><div class="dot" style="background: var(--free)"></div> 100% Dispo</span>
+                <span><div class="dot" style="background: var(--almost)"></div> -1 personne</span>
                 <span><div class="dot" style="background: var(--majority)"></div> Majorité OK</span>
-                <span>❌ Absent | 💡 Clic droit</span>
+                <span>💡 Clic droit pour les noms</span>
+            </div>
+            <div id="legend-me" class="legend" style="display:none;">
+                <span style="color: var(--absent); font-weight: bold;">Clique sur les jours où tu es ABSENT</span>
             </div>
         </div>
         
         <div id="full-calendar"></div>
         
         <div class="admin-section">
-            <h4>🛠 Gestion Admin</h4>
+            <h4>🛠 Gestion des membres (Admin)</h4>
             <div id="admin-user-list"></div>
         </div>
     </div>
@@ -108,13 +126,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const SECRET_KEY = "CREW2026";
-    let viewMode = 'crew'; // 'crew' ou 'me'
+    let viewMode = 'crew'; 
 
     // --- Sécurité ---
     window.checkPass = () => {
         if(document.getElementById('pass-input').value === SECRET_KEY) {
             localStorage.setItem('crew_access', 'true'); unlock();
-        } else alert("Raté !");
+        } else alert("Mot de passe incorrect !");
     };
     function unlock() { document.getElementById('lock-screen').style.display = 'none'; document.getElementById('main-content').style.display = 'block'; }
     if(localStorage.getItem('crew_access') === 'true') unlock();
@@ -136,12 +154,20 @@
     };
     document.getElementById('btn-logout').onclick = () => { localStorage.removeItem('crew_username'); location.reload(); };
 
-    // --- Switcher de Vue ---
-    document.getElementById('tab-crew').onclick = () => { viewMode = 'crew'; updateTabs(); };
-    document.getElementById('tab-me').onclick = () => { viewMode = 'me'; updateTabs(); };
+    // --- Gestion des Onglets ---
+    const btnCrew = document.getElementById('tab-crew');
+    const btnMe = document.getElementById('tab-me');
+    const bodyTag = document.getElementById('body-tag');
+
+    btnCrew.onclick = () => { viewMode = 'crew'; updateTabs(); };
+    btnMe.onclick = () => { viewMode = 'me'; updateTabs(); };
+
     function updateTabs() {
-        document.getElementById('tab-crew').classList.toggle('active', viewMode === 'crew');
-        document.getElementById('tab-me').classList.toggle('active', viewMode === 'me');
+        btnCrew.classList.toggle('active', viewMode === 'crew');
+        btnMe.classList.toggle('active', viewMode === 'me');
+        bodyTag.className = viewMode === 'me' ? 'mode-me' : '';
+        document.getElementById('legend-crew').style.display = viewMode === 'crew' ? 'flex' : 'none';
+        document.getElementById('legend-me').style.display = viewMode === 'me' ? 'flex' : 'none';
         onValue(ref(db, 'calendar'), (snap) => renderCalendar(snap.val() || {}), { onlyOnce: true });
     }
 
@@ -153,7 +179,7 @@
         container.innerHTML = "";
         const users = Object.keys(data.users || {});
         
-        // Admin
+        // Admin List
         const adminList = document.getElementById('admin-user-list');
         adminList.innerHTML = "";
         users.forEach(u => {
@@ -164,7 +190,7 @@
         adminList.onclick = (e) => {
             if(e.target.classList.contains('btn-del')) {
                 const n = e.target.getAttribute('data-name');
-                if(confirm(`Virer ${n} ?`)) remove(ref(db, `calendar/users/${n}`));
+                if(confirm(`Supprimer ${n} ?`)) remove(ref(db, `calendar/users/${n}`));
             }
         };
 
@@ -176,12 +202,12 @@
                 const h = document.createElement('div'); h.className = 'weekday-header'; h.innerText = d; grid.appendChild(h);
             });
 
-            const days = new Date(2026, m + 1, 0).getDate();
+            const daysCount = new Date(2026, m + 1, 0).getDate();
             let firstDay = new Date(2026, m, 1).getDay();
             let offset = firstDay === 0 ? 6 : firstDay - 1;
             for (let i = 0; i < offset; i++) grid.appendChild(document.createElement('div'));
 
-            for (let d = 1; d <= days; d++) {
+            for (let d = 1; d <= daysCount; d++) {
                 const dayId = `d${d}`;
                 const votes = (data['2026'] && data['2026'][`m${m}`] && data['2026'][`m${m}`][dayId]) || {};
                 const absents = Object.keys(votes).filter(u => votes[u] === true && users.includes(u));
@@ -192,25 +218,29 @@
                 dayBox.className = 'day';
 
                 if (viewMode === 'crew') {
+                    // Logique Agenda Groupe
                     if (absents.length === 0 && users.length > 0) dayBox.classList.add('status-all-free');
                     else if (absents.length === 1 && users.length > 1) dayBox.classList.add('status-almost');
                     else if (presents.length >= users.length / 2 && users.length > 0) dayBox.classList.add('status-majority');
+                    
                     if (isMeOut) dayBox.innerHTML += `<span class="cross">✘</span>`;
                     dayBox.innerHTML += `<div class="count">${presents.length}/${users.length}</div>`;
                 } else {
-                    // Mode MON AGENDA
+                    // Logique Mon Agenda
                     if (isMeOut) {
+                        dayBox.classList.add('is-absent');
                         dayBox.innerHTML += `<span class="cross">✘</span>`;
-                        dayBox.classList.add('status-me-out');
                     }
                 }
 
                 dayBox.innerHTML = `<span class="day-name">${["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"][new Date(2026,m,d).getDay()]}</span><span class="day-num">${d}</span>` + dayBox.innerHTML;
 
+                // Sync Auto au clic
                 dayBox.onclick = () => {
-                    if (!currentUser) return alert("Nom ?");
+                    if (!currentUser) return alert("Inscris ton nom en haut d'abord !");
                     update(ref(db, `calendar/2026/m${m}/${dayId}`), { [currentUser]: !isMeOut });
                 };
+
                 dayBox.oncontextmenu = (e) => {
                     e.preventDefault();
                     if(viewMode === 'crew') showMenu(e.pageX, e.pageY, presents, absents);
@@ -239,5 +269,4 @@
 </script>
 </body>
 </html>
-
 
